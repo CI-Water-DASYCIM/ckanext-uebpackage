@@ -1,5 +1,5 @@
 #TODO: delete this py file as we no more using background tasks
-from ckan.lib.celery_app import celery
+#from ckan.lib.celery_app import celery
 import ckan.lib.base as base
 import ckan.lib.helpers as h
 import ckan.plugins.toolkit as tk
@@ -19,11 +19,11 @@ log = logging.getLogger('ckan.logic')
 
 service_host_address = uebhelper.StringSettings.app_server_host_address  # 'thredds-ci-water.bluezone.usu.edu'
 
-@celery.task
+#@celery.task
 def add(x, y):
     return x + y
 
-@celery.task
+#@celery.task
 def check_ueb_request_process_status():
     source = 'uebpackage.tasks.check_ueb_request_process_status():'
     global service_host_address
@@ -143,7 +143,7 @@ def check_ueb_run_status():
                                'with dataset ID:%s\nException:%s' % (dataset_id, e))
 
 
-@celery.task
+#@celery.task
 def retrieve_ueb_packages():
     source = 'uebpackage.tasks.retrieve_ueb_packages():'
     global service_host_address
