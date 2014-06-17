@@ -11,6 +11,27 @@ _ = tk._  # translator function
 log = logging.getLogger('ckan.logic')
 
 
+class AJAXResponse(object):
+
+    def __init__(self):
+        self.success = False
+        self.message = ''
+        self.json_data = ''
+
+    def to_json(self):
+        fields = []
+
+        for field in vars(self):
+            fields.append(field)
+
+        d = {}
+        for attr in fields:
+            d[attr] = getattr(self, attr)
+
+        import simplejson
+        return simplejson.dumps(d)
+
+
 class MockTranslator(object):
     # def __init__(self): self.x = 1
     #
@@ -33,7 +54,7 @@ class StringSettings(object):
     ueb_request_json_file_name = 'ueb_pkg_request.json'
     ueb_request_text_resource_file_name = 'ueb_pkg_request.txt'
     ueb_request_zip_file_name = 'ueb_request.zip'
-    ueb_input_model_package_default_filename = 'ueb_model_pkg.zip'
+    ueb_input_model_package_default_filename = 'ueb-model-pkg.zip'
     ueb_output_model_package_default_filename = 'ueb_model_output_pkg.zip'
     app_server_host_address = 'thredds-ci-water.bluezone.usu.edu'
     app_server_api_generate_ueb_package_url = '/api/GenerateUEBPackage'
@@ -48,6 +69,8 @@ class StringSettings(object):
     app_server_job_status_error = 'Error'
     app_server_job_status_package_available = 'Available'
     app_server_job_status_package_not_available = 'Not available'
+    app_server_job_status_package_retrieval_failed = 'Failed to retrieve package file'
+    app_server_job_status_package_retrieval_success = 'Output package merged'
 
 
 def register_translator():
@@ -207,7 +230,7 @@ def update_package(package_id, data_dict, update_message=None, backgroundTask=Fa
         return None
         
     package_update_action = tk.get_action('package_update')
-    context = {'model': base.model, 'session': base.model.Session}
+    context = {'model': base.model, 'session': base.model.Session, 'for_edit': False}
     
     if update_message:
        context['message'] = update_message
@@ -255,8 +278,8 @@ def get_package(pkg_id_or_name):
         context['user'] = user.get('name')
         context['ignore_auth'] = True
         log.info(source + 'Register translator object for the background job')
-        register_translator()
-        log.info(source + 'Translator object was registered for the background job')
+        #register_translator()
+        #log.info(source + 'Translator object was registered for the background job')
         pass
 
     # get the resource that has the id equal to the given resource id or name
@@ -287,16 +310,7 @@ def get_package_for_resource(resource_id):
 
 def get_packages(search_data_dict):
 
-    # query_string = ''
-    # for key, value in search_data_dict.items():
-    #     if len(query_string) > 0:
-    #         query_string += ' AND ' + key + ':' + '"' + value + '"'
-    #     else:
-    #         query_string += key + ':' + value
-    #
     context = {'model': base.model, 'session': base.model.Session}
-    # data_dict = {'q': query_string}
-
     matching_packages = tk.get_action('package_search')(context, search_data_dict)
 
     return matching_packages['results']
@@ -342,7 +356,8 @@ def get_site_user():
     return user
 
 
-def retrieve_file_object_from_file_store(file_filestore_path): 
+#TODO: this method should be deleted as it is not applicable in CKAN 2.2
+def retrieve_file_object_from_file_store(file_filestore_path):
     """
     returns a file obj (in read mode) for the provided file in the ckan file store
     which the caller then can use to read the contents of the file (file_obj.read())

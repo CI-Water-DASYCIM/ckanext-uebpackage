@@ -488,462 +488,462 @@ ckan.module('package_create', function (jQuery, _) {
 
     showHidePolygonFileSelection: function(event) {
     	event.preventDefault();
-		if (this.$('#radDomainPolygonFileType').is(':checked')){
-	  		this.$('#domainShapeFileSelection').show();
-	  		this.$('#domainNetCDFFileSelection').hide();
+		if ($('#radDomainPolygonFileType').is(':checked')){
+	  		$('#domainShapeFileSelection').show();
+	  		$('#domainNetCDFFileSelection').hide();
 	  	}	  	
     },
     
     showHideNetCDFFileSelection: function(event) {
     	event.preventDefault();
-		if (this.$('#radDomainNetCDFFileType').is(':checked')){
-	  		this.$('#domainShapeFileSelection').hide();
-	  		this.$('#domainNetCDFFileSelection').show();
+		if ($('#radDomainNetCDFFileType').is(':checked')){
+	  		$('#domainShapeFileSelection').hide();
+	  		$('#domainNetCDFFileSelection').show();
 	  	}	  	
     },
     
     showHideParameterFileSelection: function(event) {
     	event.preventDefault();
-		if (this.$('#radParametersFileOptionYes').is(':checked')){
-			this.$('#parametersFileSelection').hide();
+		if ($('#radParametersFileOptionYes').is(':checked')){
+			$('#parametersFileSelection').hide();
 		}
-		if (this.$('#radParametersFileOptionNo').is(':checked')){
-			this.$('#parametersFileSelection').show();
+		if ($('#radParametersFileOptionNo').is(':checked')){
+			$('#parametersFileSelection').show();
 		}
 	},
 	
 	showHideUSICFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radUSICConstantOption').is(':checked')){
-			this.$('#usic_constant').show();
-			this.$('#usic_gridfile').hide();			
+		if ($('#radUSICConstantOption').is(':checked')){
+			$('#usic_constant').show();
+			$('#usic_gridfile').hide();			
 		}
-		if (this.$('#radUSICGridOption').is(':checked')){
-			this.$('#usic_constant').hide();
-			this.$('#usic_gridfile').show();					
+		if ($('#radUSICGridOption').is(':checked')){
+			$('#usic_constant').hide();
+			$('#usic_gridfile').show();					
 		}
 	},
 	
 	showHideWSISFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radWSISConstantOption').is(':checked')){
-			this.$('#wsis_constant').show();
-			this.$('#wsis_gridfile').hide();			
+		if ($('#radWSISConstantOption').is(':checked')){
+			$('#wsis_constant').show();
+			$('#wsis_gridfile').hide();			
 		}
-		if (this.$('#radWSISGridOption').is(':checked')){
-			this.$('#wsis_constant').hide();
-			this.$('#wsis_gridfile').show();						
+		if ($('#radWSISGridOption').is(':checked')){
+			$('#wsis_constant').hide();
+			$('#wsis_gridfile').show();						
 		}
 	},
 	
 	showHideTICFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radTICConstantOption').is(':checked')){
-			this.$('#tic_constant').show();
-			this.$('#tic_gridfile').hide();			
+		if ($('#radTICConstantOption').is(':checked')){
+			$('#tic_constant').show();
+			$('#tic_gridfile').hide();			
 		}
-		if (this.$('#radTICGridOption').is(':checked')){
-			this.$('#tic_constant').hide();
-			this.$('#tic_gridfile').show();						
+		if ($('#radTICGridOption').is(':checked')){
+			$('#tic_constant').hide();
+			$('#tic_gridfile').show();						
 		}
 	},
 	
 	showHideWCICFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radWCICConstantOption').is(':checked')){
-			this.$('#wcic_constant').show();
-			this.$('#wcic_gridfile').hide();			
+		if ($('#radWCICConstantOption').is(':checked')){
+			$('#wcic_constant').show();
+			$('#wcic_gridfile').hide();			
 		}
-		if (this.$('#radWCICGridOption').is(':checked')){
-			this.$('#wcic_constant').hide();
-			this.$('#wcic_gridfile').show();						
+		if ($('#radWCICGridOption').is(':checked')){
+			$('#wcic_constant').hide();
+			$('#wcic_gridfile').show();						
 		}
 	},
 	
 	showHideDFFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radDFConstantOption').is(':checked')){
-			this.$('#df_constant').show();
-			this.$('#df_gridfile').hide();			
+		if ($('#radDFConstantOption').is(':checked')){
+			$('#df_constant').show();
+			$('#df_gridfile').hide();			
 		}
-		if (this.$('#radDFGridOption').is(':checked')){
-			this.$('#df_constant').hide();
-			this.$('#df_gridfile').show();						
+		if ($('#radDFGridOption').is(':checked')){
+			$('#df_constant').hide();
+			$('#df_gridfile').show();						
 		}
 	},
 	
 	showHideAEPFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radAepConstantOption').is(':checked')){
-			this.$('#aep_constant').show();
-			this.$('#aep_gridfile').hide();			
+		if ($('#radAepConstantOption').is(':checked')){
+			$('#aep_constant').show();
+			$('#aep_gridfile').hide();			
 		}
-		if (this.$('#radAepGridOption').is(':checked')){
-			this.$('#aep_constant').hide();
-			this.$('#aep_gridfile').show();						
+		if ($('#radAepGridOption').is(':checked')){
+			$('#aep_constant').hide();
+			$('#aep_gridfile').show();						
 		}
 	},
 	
 	showHideSBARFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radSbarConstantOption').is(':checked')){
-			this.$('#sbar_constant').show();
-			this.$('#sbar_gridfile').hide();			
+		if ($('#radSbarConstantOption').is(':checked')){
+			$('#sbar_constant').show();
+			$('#sbar_gridfile').hide();			
 		}
-		if (this.$('#radSbarGridOption').is(':checked')){
-			this.$('#sbar_constant').hide();
-			this.$('#sbar_gridfile').show();						
+		if ($('#radSbarGridOption').is(':checked')){
+			$('#sbar_constant').hide();
+			$('#sbar_gridfile').show();						
 		}
 	},
 	
 	showHideSUBALBFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radSubalbConstantOption').is(':checked')){
-			this.$('#subalb_constant').show();
-			this.$('#subalb_gridfile').hide();			
+		if ($('#radSubalbConstantOption').is(':checked')){
+			$('#subalb_constant').show();
+			$('#subalb_gridfile').hide();			
 		}
-		if (this.$('#radSubalbGridOption').is(':checked')){
-			this.$('#subalb_constant').hide();
-			this.$('#subalb_gridfile').show();						
+		if ($('#radSubalbGridOption').is(':checked')){
+			$('#subalb_constant').hide();
+			$('#subalb_gridfile').show();						
 		}
 	},
 	
 	showHideSUBTYPEFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radSubtypeConstantOption').is(':checked')){
-			this.$('#subtype_constant').show();
-			this.$('#subtype_gridfile').hide();			
+		if ($('#radSubtypeConstantOption').is(':checked')){
+			$('#subtype_constant').show();
+			$('#subtype_gridfile').hide();			
 		}
-		if (this.$('#radSubtypeGridOption').is(':checked')){
-			this.$('#subtype_constant').hide();
-			this.$('#subtype_gridfile').show();						
+		if ($('#radSubtypeGridOption').is(':checked')){
+			$('#subtype_constant').hide();
+			$('#subtype_gridfile').show();						
 		}
 	},
 	
 	showHideGSURFFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radGsurfConstantOption').is(':checked')){
-			this.$('#gsurf_constant').show();
-			this.$('#gsurf_gridfile').hide();			
+		if ($('#radGsurfConstantOption').is(':checked')){
+			$('#gsurf_constant').show();
+			$('#gsurf_gridfile').hide();			
 		}
-		if (this.$('#radGsurfGridOption').is(':checked')){
-			this.$('#gsurf_constant').hide();
-			this.$('#gsurf_gridfile').show();						
+		if ($('#radGsurfGridOption').is(':checked')){
+			$('#gsurf_constant').hide();
+			$('#gsurf_gridfile').show();						
 		}
 	},
 	
 	showHideTSLASTFields: function(event) {
     	event.preventDefault();
-		if (this.$('#radTslastConstantOption').is(':checked')){
-			this.$('#tslast_constant').show();
-			this.$('#tslast_gridfile').hide();			
+		if ($('#radTslastConstantOption').is(':checked')){
+			$('#tslast_constant').show();
+			$('#tslast_gridfile').hide();			
 		}
-		if (this.$('#radTslastGridOption').is(':checked')){
-			this.$('#tslast_constant').hide();
-			this.$('#tslast_gridfile').show();						
+		if ($('#radTslastGridOption').is(':checked')){
+			$('#tslast_constant').hide();
+			$('#tslast_gridfile').show();						
 		}
 	},
 	
 	showHideCCFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radCCConstantOption').is(':checked')){
-	  		this.$('#cc_constant').show();
-	  		this.$('#cc_gridfile').hide();  		
+    	if ($('#radCCConstantOption').is(':checked')){
+	  		$('#cc_constant').show();
+	  		$('#cc_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radCCGridOption').is(':checked')){
-	  	  	this.$('#cc_constant').hide();
-	  		this.$('#cc_gridfile').show();  		
+	  	else if ($('#radCCGridOption').is(':checked')){
+	  	  	$('#cc_constant').hide();
+	  		$('#cc_gridfile').show();  		
 	  	}
 	  	else{
-	  	  	this.$('#cc_constant').hide();
-	  		this.$('#cc_gridfile').hide();  
+	  	  	$('#cc_constant').hide();
+	  		$('#cc_gridfile').hide();  
 	  	}
 	},
 	
 	showHideHCANFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radHcanConstantOption').is(':checked')){
-	  		this.$('#hcan_constant').show();
-	  		this.$('#hcan_gridfile').hide();  		
+    	if ($('#radHcanConstantOption').is(':checked')){
+	  		$('#hcan_constant').show();
+	  		$('#hcan_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radHcanGridOption').is(':checked')){
-	  	  	this.$('#hcan_constant').hide();
-	  		this.$('#hcan_gridfile').show();  		
+	  	else if ($('#radHcanGridOption').is(':checked')){
+	  	  	$('#hcan_constant').hide();
+	  		$('#hcan_gridfile').show();  		
 	  	}
 	  	else{
-	  	  	this.$('#hcan_constant').hide();
-	  		this.$('#hcan_gridfile').hide();  
+	  	  	$('#hcan_constant').hide();
+	  		$('#hcan_gridfile').hide();  
 	  	}
 	},
 	
 	showHideLAIFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radLaiConstantOption').is(':checked')){
-	  		this.$('#lai_constant').show();
-	  		this.$('#lai_gridfile').hide();  		
+    	if ($('#radLaiConstantOption').is(':checked')){
+	  		$('#lai_constant').show();
+	  		$('#lai_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radLaiGridOption').is(':checked')){
-	  	  	this.$('#lai_constant').hide();
-	  		this.$('#lai_gridfile').show();  		
+	  	else if ($('#radLaiGridOption').is(':checked')){
+	  	  	$('#lai_constant').hide();
+	  		$('#lai_gridfile').show();  		
 	  	}
 	  	else{
-	  	  	this.$('#lai_constant').hide();
-	  		this.$('#lai_gridfile').hide();  
+	  	  	$('#lai_constant').hide();
+	  		$('#lai_gridfile').hide();  
 	  	}
 	},
 	
 	showHideYCAGEFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radYcageConstantOption').is(':checked')){
-	  		this.$('#ycage_constant').show();
-	  		this.$('#ycage_gridfile').hide();  		
+    	if ($('#radYcageConstantOption').is(':checked')){
+	  		$('#ycage_constant').show();
+	  		$('#ycage_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radYcageGridOption').is(':checked')){
-	  	  	this.$('#ycage_constant').hide();
-	  		this.$('#ycage_gridfile').show();  		
+	  	else if ($('#radYcageGridOption').is(':checked')){
+	  	  	$('#ycage_constant').hide();
+	  		$('#ycage_gridfile').show();  		
 	  	}
 	  	else{
-	  	  	this.$('#ycage_constant').hide();
-	  		this.$('#ycage_gridfile').hide();  
+	  	  	$('#ycage_constant').hide();
+	  		$('#ycage_gridfile').hide();  
 	  	}
 	},
 	
 	showHideAprFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radAprConstantOption').is(':checked')){
-	  		this.$('#apr_constant').show();
-	  		this.$('#apr_gridfile').hide();  		
+    	if ($('#radAprConstantOption').is(':checked')){
+	  		$('#apr_constant').show();
+	  		$('#apr_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radAprGridOption').is(':checked')){
-	  	  	this.$('#apr_constant').hide();
-	  		this.$('#apr_gridfile').show();  		
+	  	else if ($('#radAprGridOption').is(':checked')){
+	  	  	$('#apr_constant').hide();
+	  		$('#apr_gridfile').show();  		
 	  	}
 	  	else{ //apr compute option selected
-	  	  	this.$('#apr_constant').hide();
-	  		this.$('#apr_gridfile').hide();  
+	  	  	$('#apr_constant').hide();
+	  		$('#apr_gridfile').hide();  
 	  	}
 	},
 	
 	showHideSlopeFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radSlopeConstantOption').is(':checked')){
-		  	this.$('#slope_constant').show();
-		  	this.$('#slope_gridfile').hide();  		
+    	if ($('#radSlopeConstantOption').is(':checked')){
+		  	$('#slope_constant').show();
+		  	$('#slope_gridfile').hide();  		
 		}
-		else if (this.$('#radSlopeGridOption').is(':checked')){
-		  	this.$('#slope_constant').hide();
-		  	this.$('#slope_gridfile').show();  		
+		else if ($('#radSlopeGridOption').is(':checked')){
+		  	$('#slope_constant').hide();
+		  	$('#slope_gridfile').show();  		
 		}
 		else{ // compute option selected
-		  	this.$('#slope_constant').hide();
-		  	this.$('#slope_gridfile').hide();  
+		  	$('#slope_constant').hide();
+		  	$('#slope_gridfile').hide();  
 		}
 	},
 	
 	showHideAspectFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radAspectConstantOption').is(':checked')){
-	  		this.$('#aspect_constant').show();
-	  		this.$('#aspect_gridfile').hide();  		
+    	if ($('#radAspectConstantOption').is(':checked')){
+	  		$('#aspect_constant').show();
+	  		$('#aspect_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radAspectGridOption').is(':checked')){
-	  		this.$('#aspect_constant').hide();
-	  		this.$('#aspect_gridfile').show();  		
+	  	else if ($('#radAspectGridOption').is(':checked')){
+	  		$('#aspect_constant').hide();
+	  		$('#aspect_gridfile').show();  		
 	  	}
 	  	else{ // compute option selected
-	  		this.$('#aspect_constant').hide();
-	  		this.$('#aspect_gridfile').hide();  
+	  		$('#aspect_constant').hide();
+	  		$('#aspect_gridfile').hide();  
 	  	}
    },
    
    showHideLatitudeFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radLatConstantOption').is(':checked')){
-	  		this.$('#lat_constant').show();
-	  		this.$('#lat_gridfile').hide();  		
+    	if ($('#radLatConstantOption').is(':checked')){
+	  		$('#lat_constant').show();
+	  		$('#lat_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radLatGridOption').is(':checked')){
-	  		this.$('#lat_constant').hide();
-	  		this.$('#lat_gridfile').show();  		
+	  	else if ($('#radLatGridOption').is(':checked')){
+	  		$('#lat_constant').hide();
+	  		$('#lat_gridfile').show();  		
 	  	}
 	  	else{ // compute option selected
-	  		this.$('#lat_constant').hide();
-	  		this.$('#lat_gridfile').hide();  
+	  		$('#lat_constant').hide();
+	  		$('#lat_gridfile').hide();  
 	  }
    },
    
    showHideLongitudeFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radLonConstantOption').is(':checked')){
-		  	this.$('#lon_constant').show();
-		  	this.$('#lon_gridfile').hide();  		
+    	if ($('#radLonConstantOption').is(':checked')){
+		  	$('#lon_constant').show();
+		  	$('#lon_gridfile').hide();  		
 		}
-		else if (this.$('#radLonGridOption').is(':checked')){
-		  	this.$('#lon_constant').hide();
-		  	this.$('#lon_gridfile').show();  		
+		else if ($('#radLonGridOption').is(':checked')){
+		  	$('#lon_constant').hide();
+		  	$('#lon_gridfile').show();  		
 		}
 		else{ // compute option selected
-		  	this.$('#lon_constant').hide();
-		  	this.$('#lon_gridfile').hide();  
+		  	$('#lon_constant').hide();
+		  	$('#lon_gridfile').hide();  
 		}
    },
    
    showHideTemperatureFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radTempConstantOption').is(':checked')){
-	  		this.$('#temp_constant').show();
-	  		this.$('#temp_textfile').hide();
-	  		this.$('#temp_gridfile').hide();  		
+    	if ($('#radTempConstantOption').is(':checked')){
+	  		$('#temp_constant').show();
+	  		$('#temp_textfile').hide();
+	  		$('#temp_gridfile').hide();  		
 		}
-		else if (this.$('#radTempTextOption').is(':checked')){
-		  	this.$('#temp_textfile').show();
-		  	this.$('#temp_constant').hide();
-		  	this.$('#temp_gridfile').hide();  		
+		else if ($('#radTempTextOption').is(':checked')){
+		  	$('#temp_textfile').show();
+		  	$('#temp_constant').hide();
+		  	$('#temp_gridfile').hide();  		
 	    }
-		else if (this.$('#radTempGridOption').is(':checked')){
-		  	this.$('#temp_textfile').hide();
-		  	this.$('#temp_constant').hide();
-		  	this.$('#temp_gridfile').show();  
+		else if ($('#radTempGridOption').is(':checked')){
+		  	$('#temp_textfile').hide();
+		  	$('#temp_constant').hide();
+		  	$('#temp_gridfile').show();  
 		}
 		else{ //
-		  	this.$('#temp_constant').hide();
-		  	this.$('#temp_textfile').hide();
-		  	this.$('#temp_gridfile').hide();  
+		  	$('#temp_constant').hide();
+		  	$('#temp_textfile').hide();
+		  	$('#temp_gridfile').hide();  
 		}
    },
    
    showHidePrecipitationFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radPrecConstantOption').is(':checked')){
-	  		this.$('#prec_constant').show();
-	  		this.$('#prec_textfile').hide();
-	  		this.$('#prec_gridfile').hide();  		
+    	if ($('#radPrecConstantOption').is(':checked')){
+	  		$('#prec_constant').show();
+	  		$('#prec_textfile').hide();
+	  		$('#prec_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radPrecTextOption').is(':checked')){
-	  		this.$('#prec_textfile').show();
-	  		this.$('#prec_constant').hide();
-	  		this.$('#prec_gridfile').hide();  		
+	  	else if ($('#radPrecTextOption').is(':checked')){
+	  		$('#prec_textfile').show();
+	  		$('#prec_constant').hide();
+	  		$('#prec_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radPrecGridOption').is(':checked')){
-	  		this.$('#prec_textfile').hide();
-	  		this.$('#prec_constant').hide();
-	  		this.$('#prec_gridfile').show();  
+	  	else if ($('#radPrecGridOption').is(':checked')){
+	  		$('#prec_textfile').hide();
+	  		$('#prec_constant').hide();
+	  		$('#prec_gridfile').show();  
 	  	}
 	  	else{ //
-	  		this.$('#prec_constant').hide();
-	  		this.$('#prec_textfile').hide();
-	  		this.$('#prec_gridfile').hide();  
+	  		$('#prec_constant').hide();
+	  		$('#prec_textfile').hide();
+	  		$('#prec_gridfile').hide();  
 	  }
    },
    
    showHideWindFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radWindConstantOption').is(':checked')){
-		  	this.$('#wind_constant').show();
-		  	this.$('#wind_textfile').hide();
-		  	this.$('#wind_gridfile').hide();  		
+    	if ($('#radWindConstantOption').is(':checked')){
+		  	$('#wind_constant').show();
+		  	$('#wind_textfile').hide();
+		  	$('#wind_gridfile').hide();  		
 		}
-	  	else if (this.$('#radWindTextOption').is(':checked')){
-	  		this.$('#wind_textfile').show();
-	  		this.$('#wind_constant').hide();
-	  		this.$('#wind_gridfile').hide();  		
+	  	else if ($('#radWindTextOption').is(':checked')){
+	  		$('#wind_textfile').show();
+	  		$('#wind_constant').hide();
+	  		$('#wind_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radWindGridOption').is(':checked')){
-	  		this.$('#wind_textfile').hide();
-	  		this.$('#wind_constant').hide();
-	  		this.$('#wind_gridfile').show();  
+	  	else if ($('#radWindGridOption').is(':checked')){
+	  		$('#wind_textfile').hide();
+	  		$('#wind_constant').hide();
+	  		$('#wind_gridfile').show();  
 	  	}
 	  	else{ //
-	  		this.$('#wind_constant').hide();
-	  		this.$('#wind_textfile').hide();
-	  		this.$('#wind_gridfile').hide();  
+	  		$('#wind_constant').hide();
+	  		$('#wind_textfile').hide();
+	  		$('#wind_gridfile').hide();  
 	  	}
    },
    
    showHideRhFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radRhConstantOption').is(':checked')){
-	  		this.$('#rh_constant').show();
-	  		this.$('#rh_textfile').hide();
-	  		this.$('#rh_gridfile').hide();  		
+    	if ($('#radRhConstantOption').is(':checked')){
+	  		$('#rh_constant').show();
+	  		$('#rh_textfile').hide();
+	  		$('#rh_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radRhTextOption').is(':checked')){
-	  		this.$('#rh_textfile').show();
-	  		this.$('#rh_constant').hide();
-	  		this.$('#rh_gridfile').hide();  		
+	  	else if ($('#radRhTextOption').is(':checked')){
+	  		$('#rh_textfile').show();
+	  		$('#rh_constant').hide();
+	  		$('#rh_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radRhGridOption').is(':checked')){
-	  		this.$('#rh_textfile').hide();
-	  		this.$('#rh_constant').hide();
-	  		this.$('#rh_gridfile').show();  
+	  	else if ($('#radRhGridOption').is(':checked')){
+	  		$('#rh_textfile').hide();
+	  		$('#rh_constant').hide();
+	  		$('#rh_gridfile').show();  
 	  	}
 	  	else{ //
-	  		this.$('#rh_constant').hide();
-	  		this.$('#rh_textfile').hide();
-	  		this.$('#rh_gridfile').hide();  
+	  		$('#rh_constant').hide();
+	  		$('#rh_textfile').hide();
+	  		$('#rh_gridfile').hide();  
 	  	}
    },
    
    showHideSnowalbFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radSnowalbConstantOption').is(':checked')){
-	  		this.$('#snowalb_constant').show();
-	  		this.$('#snowalb_textfile').hide();
-	  		this.$('#snowalb_gridfile').hide();  		
+    	if ($('#radSnowalbConstantOption').is(':checked')){
+	  		$('#snowalb_constant').show();
+	  		$('#snowalb_textfile').hide();
+	  		$('#snowalb_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radSnowalbTextOption').is(':checked')){
-	  		this.$('#snowalb_textfile').show();
-	  		this.$('#snowalb_constant').hide();
-	  		this.$('#snowalb_gridfile').hide();  		
+	  	else if ($('#radSnowalbTextOption').is(':checked')){
+	  		$('#snowalb_textfile').show();
+	  		$('#snowalb_constant').hide();
+	  		$('#snowalb_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radSnowalbGridOption').is(':checked')){
-	  		this.$('#snowalb_textfile').hide();
-	  		this.$('#snowalb_constant').hide();
-	  		this.$('#snowalb_gridfile').show();  
+	  	else if ($('#radSnowalbGridOption').is(':checked')){
+	  		$('#snowalb_textfile').hide();
+	  		$('#snowalb_constant').hide();
+	  		$('#snowalb_gridfile').show();  
 	  	}
 	  	else{ //
-	  		this.$('#snowalb_constant').hide();
-	  		this.$('#snowalb_textfile').hide();
-	  		this.$('#snowalb_gridfile').hide();  
+	  		$('#snowalb_constant').hide();
+	  		$('#snowalb_textfile').hide();
+	  		$('#snowalb_gridfile').hide();  
 	  	}
    },
    
    showHideQgFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radQgConstantOption').is(':checked')){
-	  		this.$('#qg_constant').show();
-	  		this.$('#qg_textfile').hide();
-	  		this.$('#qg_gridfile').hide();  		
+    	if ($('#radQgConstantOption').is(':checked')){
+	  		$('#qg_constant').show();
+	  		$('#qg_textfile').hide();
+	  		$('#qg_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radQgTextOption').is(':checked')){
-	  		this.$('#qg_textfile').show();
-	  		this.$('#qg_constant').hide();
-	  		this.$('#qg_gridfile').hide();  		
+	  	else if ($('#radQgTextOption').is(':checked')){
+	  		$('#qg_textfile').show();
+	  		$('#qg_constant').hide();
+	  		$('#qg_gridfile').hide();  		
 	  	}
-	  	else if (this.$('#radQgGridOption').is(':checked')){
-	  		this.$('#qg_textfile').hide();
-	  		this.$('#qg_constant').hide();
-	  		this.$('#qg_gridfile').show();  
+	  	else if ($('#radQgGridOption').is(':checked')){
+	  		$('#qg_textfile').hide();
+	  		$('#qg_constant').hide();
+	  		$('#qg_gridfile').show();  
 	  	}
    },
    
    showHideOutputControlFileFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radDefaultOutputControlFileYes').is(':checked')){  		
-  			this.$('#output_controlfile').hide();
+    	if ($('#radDefaultOutputControlFileYes').is(':checked')){  		
+  			$('#output_controlfile').hide();
 	  	}
 	  	else {
-	  		this.$('#output_controlfile').show();	  	
+	  		$('#output_controlfile').show();	  	
 	  	}	
    },
    
    showHideAggrOutputControlFileFields: function(event) {
     	event.preventDefault();
-    	if (this.$('#radDefaultAggrOutputControlFileYes').is(':checked')){  		
-  			this.$('#aggroutput_controlfile').hide();
+    	if ($('#radDefaultAggrOutputControlFileYes').is(':checked')){  		
+  			$('#aggroutput_controlfile').hide();
 	  	}
 	  	else {
-	  		this.$('#aggroutput_controlfile').show();	  	
+	  		$('#aggroutput_controlfile').show();	  	
 	  }	
    }
   };

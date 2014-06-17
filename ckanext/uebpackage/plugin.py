@@ -1,4 +1,5 @@
 import ckan.plugins as p
+import ckan.lib.base as base
 from apscheduler.scheduler import Scheduler
 from ckan.common import c
 import ckan.lib.helpers as h 
@@ -12,6 +13,7 @@ import time
 log = logging.getLogger('ckan.logic')
 
 
+# TODO: delete this class as we are no more using any background tasks in CKAN 2.2
 class UEBScheduler(object):
     @classmethod
     def run_apcheduler(self):
@@ -40,7 +42,16 @@ class UEBScheduler(object):
 
             try:
                 log.info(source + "Checking ueb model build request status")
-                tasks.check_ueb_request_process_status()
+                from routes import request_config
+                from routes.mapper import Mapper
+                config = request_config()
+                config.mapper = Mapper()
+                config.host = '127.0.0.1:5000'
+                config.protocol = 'http'
+                #if hasattr(config, 'using_request_local'):
+                config.request_local = tasks.check_ueb_request_process_status()
+                config = request_config()
+                    #tasks.check_ueb_request_process_status()
                 log.info(source + "UEB model build request status check finished")
             except Exception as e:
                 log.error(source + 'Failed to check ueb package build request status.\nException:%s' % e)
@@ -103,6 +114,14 @@ def uebpackage_build_main_navigation(*args):
     return output
 
 
+def get_package_extras(pkg_id):
+    context = {'model': base.model, 'session': base.model.Session,
+                   'user': c.user or c.author, 'for_view': True,
+                   'auth_user_obj': c.userobj}
+    data_dict = {'id': pkg_id}
+    package = p.toolkit.get_action('package_show')(context, data_dict)
+    return package['extras']
+
 class UebPackagePlugins(p.SingletonPlugin):
     # Set inherit=True so that we don't have to implement all functions of this interface
     p.implements(p.IRoutes, inherit=True) 
@@ -137,7 +156,11 @@ class UebPackagePlugins(p.SingletonPlugin):
                     action='packagecreateform')
         map.connect('/uebpackage/createformsubmit', controller='ckanext.uebpackage.controllers.packagecreate:PackagecreateController', action='submit')
         map.connect('/uebpackage/selectpackagetoexecute', controller='ckanext.uebpackage.controllers.uebexecute:UEBexecuteController', action='select_model_package')
-        map.connect('/uebpackage/ueb_execute', controller='ckanext.uebpackage.controllers.uebexecute:UEBexecuteController', action='execute')
+        map.connect('/uebpackage/ueb_execute/{pkg_id}', controller='ckanext.uebpackage.controllers.uebexecute:UEBexecuteController', action='execute')
+        map.connect('/uebpackage/ueb_execute_status/{pkg_id}', controller='ckanext.uebpackage.controllers.uebexecute:UEBexecuteController', action='check_package_run_status')
+        map.connect('/uebpackage/check_package_build_status/{pkg_id}', controller='ckanext.uebpackage.controllers.packagecreate:PackagecreateController', action='check_package_build_status')
+        map.connect('/uebpackage/retrieve_input_package/{pkg_id}', controller='ckanext.uebpackage.controllers.packagecreate:PackagecreateController', action='retrieve_input_package')
+        map.connect('/uebpackage/retrieve_output_package/{pkg_id}', controller='ckanext.uebpackage.controllers.uebexecute:UEBexecuteController', action='retrieve_output_package')
         return map
 
     # ITemplateHelpers method implementation
@@ -146,6 +169,8 @@ class UebPackagePlugins(p.SingletonPlugin):
         # Template helper function names (e.g: 'uebpackage_build_nav_main')should begin with the name of the
         # extension they belong to, to avoid clashing with functions from
         # other extensions.
-        return {'uebpackage_build_nav_main': uebpackage_build_main_navigation}
-   
-    UEBScheduler.run_apcheduler()
+        return {'uebpackage_build_nav_main': uebpackage_build_main_navigation,
+                'get_package_extras': get_package_extras}
+
+    # TODO: delete the following one comment line
+    #UEBScheduler.run_apcheduler()

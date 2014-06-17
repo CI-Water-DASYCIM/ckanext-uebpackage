@@ -3,22 +3,18 @@ import logging
 import ckan.plugins as p
 from ckan.lib.helpers import json
 from ckan.controllers import storage
-import ckan.lib.helpers as h
-from sqlalchemy import *
+import ckan.lib.uploader as uploader
+import ckan.lib.munge as munge
 from datetime import datetime
 import os
 import shutil
 import httplib
 from .. import helpers as uebhelper
 
-from pylons import response
-
 tk = p.toolkit
 _ = tk._    # translator function
 
 log = logging.getLogger('ckan.logic')
-
-# response.charset = 'utf8'
 
 
 class PackagecreateController(base.BaseController):
@@ -158,34 +154,285 @@ class PackagecreateController(base.BaseController):
         form_vars['stages'] = stages
         return tk.render('packagecreateform.html', extra_vars=form_vars)
 
+    def check_package_build_status(self, pkg_id):
+
+        """
+        Retrievs the status of the model package build process from the app server for a given model configuration
+        dataset
+        @param pkg_id: id of the model configuration dataset for which the package build status to be obtained
+        @return: ajax_response object
+        """
+        source = 'uebpackage.packagecreate.check_package_build_status():'
+        service_host_address = uebhelper.StringSettings.app_server_host_address
+        service_request_api_url = uebhelper.StringSettings.app_server_api_check_ueb_package_build_status
+        connection = httplib.HTTPConnection(service_host_address)
+        package = uebhelper.get_package(pkg_id)
+        ajax_response = uebhelper.AJAXResponse()
+        ajax_response.success = False
+        ajax_response.message = "Not a valid package for status check"
+        if package['type'] == 'model-configuration':
+            if package.get('processing_status', None):
+                if package['processing_status'] == 'In Queue' or package['processing_status'] == 'Processing':
+                    pkg_process_job_id = package.get('package_build_request_job_id', None)
+                    pkg_current_processing_status = package.get('processing_status', None)
+                    if pkg_process_job_id:
+                        service_request_url = service_request_api_url + '?packageID=' + pkg_process_job_id
+                        connection.request('GET', service_request_url)
+                        service_call_results = connection.getresponse()
+                        if service_call_results.status == httplib.OK:
+                            request_processing_status = service_call_results.read()
+                            log.info(source + 'UEB model package build status as returned from App server '
+                                              'for PackageJobID:%s is %s' % (pkg_process_job_id,
+                                                                             request_processing_status))
+                        else:
+                            request_processing_status = uebhelper.StringSettings.app_server_job_status_error
+                            log.error(source + 'HTTP status %d returned from App server when checking '
+                                   'status for PackageJobID:%s' % (service_call_results.status, pkg_process_job_id))
+                            ajax_response.success = False
+                            ajax_response.message = "Error in checking status"
+
+                        connection.close()
+
+                        # update the dataset if the status has changed
+                        if pkg_current_processing_status != request_processing_status:
+                            data_dict = {'processing_status': request_processing_status}
+                            uebhelper.update_package(pkg_id, data_dict, backgroundTask=False)
+                        ajax_response.success = True
+                        ajax_response.message = "Status check was successful"
+                        ajax_response.json_data = request_processing_status
+
+        return ajax_response.to_json()
+
+    def retrieve_input_package(self, pkg_id):
+
+        """
+        Retrieves the model input package from the app server and saves it as a new dataset
+        @param pkg_id: id of the model configuration dataset for which the model input package to be retrieved
+        @rtype: ajax_response object
+        """
+
+        source = 'uebpackage.packagecreate.retrieve_input_package():'
+        service_host_address = uebhelper.StringSettings.app_server_host_address
+        service_request_api_url = uebhelper.StringSettings.app_server_api_get_ueb_package_url
+        connection = httplib.HTTPConnection(service_host_address)
+        package = uebhelper.get_package(pkg_id)
+        ajax_response = uebhelper.AJAXResponse()
+        ajax_response.success = False
+        ajax_response.message = "Not a valid UEB model configuration datatset for model package retrieval"
+        if package['type'] == 'model-configuration':
+            if package.get('processing_status', None):
+                if package['package_availability'] == 'Not available':
+                    pkg_process_job_id = package.get('package_build_request_job_id', None)
+                    pkg_current_availability_status = package.get('package_availability', None)
+                    if pkg_process_job_id:
+                        service_request_url = service_request_api_url + '?packageID=' + pkg_process_job_id
+                        connection.request('GET', service_request_url)
+                        service_call_results = connection.getresponse()
+                        if service_call_results.status == httplib.OK:
+                            log.info(source + 'UEB model package was received from App server for PackageJobID:%s' % pkg_process_job_id)
+                            try:
+                                _save_ueb_package_as_dataset(service_call_results, pkg_id)
+                                pkg_availability_status = uebhelper.StringSettings.app_server_job_status_package_available
+                                ajax_response.success = True
+                                ajax_response.message = "Model package retrieval was successful"
+                                ajax_response.json_data = pkg_availability_status
+                            except Exception as e:
+                                log.error(source + 'Failed to save ueb model package as a new dataset '
+                                                   'for model configuration dataset ID:%s\nException:%s' % (pkg_id, e))
+                                pkg_availability_status = uebhelper.StringSettings.app_server_job_status_error
+                                ajax_response.success = False
+                                ajax_response.message = "Failed to save the retrieved model package"
+                                ajax_response.json_data = pkg_availability_status
+                        else:
+                            log.error(source + 'HTTP status %d returned from App server when retrieving '
+                                               'UEB model package for PackageJobID:'
+                                               '%s' % (service_call_results.status, pkg_process_job_id))
+                            pkg_availability_status = uebhelper.StringSettings.app_server_job_status_error
+                            ajax_response.success = False
+                            ajax_response.message = "Error in retrieving the model package"
+                            ajax_response.json_data = pkg_availability_status
+
+                        connection.close()
+
+                        # update the related model-configuration dataset status
+                        data_dict = {'package_availability': pkg_availability_status}
+                        update_msg = 'updated package availability status'
+                        background_task = False
+
+                        if pkg_current_availability_status != pkg_availability_status:
+                            try:
+                                updated_package = uebhelper.update_package(pkg_id, data_dict, update_msg,
+                                                                           background_task)
+                                log.info(source + 'UEB model configuration dataset was updated as a result of '
+                                                  'receiving model input package for dataset:%s'
+                                         % updated_package['name'])
+
+                            except Exception as e:
+                                log.error(source + 'Failed to update UEB model configuration dataset after '
+                                                   'receiving model input package for dataset ID:%s \n'
+                                                   'Exception: %s' % (pkg_id, e))
+                                pass
+
+        return ajax_response.to_json()
+
+
+def _save_ueb_package_as_dataset(service_call_results, model_config_dataset_id):
+
+    """
+    Saves the model input package obtained for the app server as a new dataset
+    @param service_call_results: service response obtained from the app server
+    @param model_config_dataset_id: id of the model configuration dataset for which the generated model package to be
+    retrieved.
+    @return:
+    """
+    source = 'uebpackage.tasks._save_ueb_package_as_dataset():'
+    ckan_default_dir = uebhelper.StringSettings.ckan_user_session_temp_dir  # '/tmp/ckan'
+
+    # get the matching model configuration dataset object
+    model_config_dataset_obj = base.model.Package.get(model_config_dataset_id)
+    model_config_dataset_title = model_config_dataset_obj.title
+    model_config_dataset_owner_org = model_config_dataset_obj.owner_org
+    model_config_dataset_author = model_config_dataset_obj.author
+
+    # create a directory for saving the file
+    # this will be a dir in the form of: /tmp/ckan/{random_id}
+    random_id = base.model.types.make_uuid()
+    destination_dir = os.path.join(ckan_default_dir, random_id)
+    os.makedirs(destination_dir)
+
+    model_pkg_filename = uebhelper.StringSettings.ueb_input_model_package_default_filename   # 'ueb_model_pkg.zip'
+    model_pkg_file = os.path.join(destination_dir, model_pkg_filename)
+
+    bytes_to_read = 16 * 1024
+
+    try:
+        with open(model_pkg_file, 'wb') as file_obj:
+            while True:
+                data = service_call_results.read(bytes_to_read)
+                if not data:
+                    break
+                file_obj.write(data)
+    except Exception as e:
+        log.error(source + 'Failed to save the ueb_package zip file to temporary '
+                           'location for UEB model configuration dataset ID: %s \n '
+                           'Exception: %s' % (model_config_dataset_id, e))
+        raise e
+
+    log.info(source + 'ueb_package zip file was saved to temporary location for '
+                      'UEB model configuration dataset ID: %s' % model_config_dataset_id)
+
+    user = uebhelper.get_site_user()
+    # create a package
+    package_create_action = tk.get_action('package_create')
+
+    # create unique package name using the current time stamp as a postfix to any package name
+    unique_postfix = datetime.now().isoformat().replace(':', '-').replace('.', '-').lower()
+    pkg_title = model_config_dataset_title
+
+    data_dict = {
+                    'name': 'model_package_' + unique_postfix,  # this needs to be unique as required by DB
+                    'type': 'model-package',  # dataset type as defined in custom dataset plugin
+                    'title': pkg_title,
+                    'owner_org': model_config_dataset_owner_org,
+                    'author': model_config_dataset_author,
+                    'notes': 'UEB model package',
+                    'pkg_model_name': 'UEB',
+                    'model_version': '1.0',
+                    'north_extent': '',
+                    'south_extent': '',
+                    'east_extent': '',
+                    'west_extent': '',
+                    'simulation_start_day': '',
+                    'simulation_end_day': '',
+                    'time_step': '',
+                    'package_type': u'Input',
+                    'package_run_status': 'Not yet submitted',
+                    'package_run_job_id': '',
+                    'dataset_type': 'model-package'
+                 }
+
+    context = {'model': base.model, 'session': base.model.Session, 'ignore_auth': True, 'user': user.get('name'), 'save': 'save'}
+    try:
+        pkg_dict = package_create_action(context, data_dict)
+        log.info(source + 'A new dataset was created for UEB input model package with name: %s' % data_dict['title'])
+    except Exception as e:
+        log.error(source + 'Failed to create a new dataset for ueb input model package for'
+                           ' the related model configuration dataset title: %s \n Exception: %s' % (pkg_title, e))
+        raise e
+
+    if not 'resources' in pkg_dict:
+        pkg_dict['resources'] = []
+
+    try:
+        file_name = model_pkg_filename  # munge.munge_filename(model_pkg_filename)
+        resource = {'url': file_name, 'url_type': 'upload'}
+        upload = uploader.ResourceUpload(resource)
+        upload.filename = file_name
+        upload.upload_file = open(model_pkg_file, 'r')
+        data_dict = {'format': 'zip', 'name': file_name, 'url': file_name, 'url_type': 'upload'}
+        pkg_dict['resources'].append(data_dict)
+    except Exception as e:
+        log.error(source + ' Failed to save the model package zip file as'
+                            ' a resource.\n Exception: %s' % e)
+
+    try:
+        context['defer_commit'] = True
+        context['use_cache'] = False
+        # update the package
+        package_update_action = tk.get_action('package_update')
+        package_update_action(context, pkg_dict)
+        context.pop('defer_commit')
+    except Exception as e:
+        log.error(source + ' Failed to update the new dataset for adding the input model package zip file as'
+                            ' a resource.\n Exception: %s' % e)
+
+        raise e
+
+    # Get out resource_id resource from model as it will not appear in
+    # package_show until after commit
+    upload.upload(context['package'].resources[-1].id, uploader.get_max_resource_size())
+    base.model.repo.commit()
+
+    # update the related model configuration dataset to show that the package is available
+    data_dict = {'package_availability': 'Available'}
+    update_msg = 'system auto updated ueb package dataset'
+    background_task = False
+    try:
+        updated_package = uebhelper.update_package(model_config_dataset_id, data_dict, update_msg, background_task)
+        log.info(source + 'UEB model configuration dataset was updated as a result of '
+                          'receiving model input package for dataset:%s' % updated_package['name'])
+    except Exception as e:
+        log.error(source + 'Failed to update UEB model configuration dataset after '
+                           'receiving model input package for dataset ID:%s \n'
+                           'Exception: %s' % (model_config_dataset_id, e))
+        raise e
+
 
 def _process_ueb_pkg_request_submit():
     pkgname = base.session['stage_1']['pkgname']
     selected_user_org = base.session['stage_1']['owner_org']
     ueb_pkg_request = _get_package_request_in_json_format() 
     selected_file_ids = ueb_pkg_request['selected_file_ids']
-    ueb_pkg_request_in_json = ueb_pkg_request['ueb_req_json']  
-    #ueb_model_pkg_request_resource_id = _save_ueb_request_as_resource(pkgname, selected_file_ids)
+    ueb_pkg_request_in_json = ueb_pkg_request['ueb_req_json']
     model_configuration_pkg_id = _save_ueb_request_as_dataset(pkgname, selected_file_ids, selected_user_org)
-    request_zip_file = _create_ueb_pkg_build_request_zip_file(ueb_pkg_request_in_json, selected_file_ids) 
-    pkg_process_id = _send_request_to_app_server(request_zip_file)
-    #_update_request_resource_process_job_id(ueb_model_pkg_request_resource_id, pkg_process_id)
-    job_status_queue = uebhelper.StringSettings.app_server_job_status_in_queue
-    data_dict = {'package_build_request_job_id': pkg_process_id, 'processing_status': job_status_queue}
 
-    #_update_request_resource_process_status(ueb_model_pkg_request_resource_id, job_status_queue)
-    uebhelper.update_package(model_configuration_pkg_id, data_dict)
-    base.session.clear()        
-    tk.c.request_process_job_id = pkg_process_id
-    return tk.render('package_build_request_submission.html')
-    
+    if model_configuration_pkg_id:
+        request_zip_file = _create_ueb_pkg_build_request_zip_file(ueb_pkg_request_in_json, selected_file_ids)
+        pkg_process_id = _send_request_to_app_server(request_zip_file)
+        job_status_queue = uebhelper.StringSettings.app_server_job_status_in_queue
+        data_dict = {'package_build_request_job_id': pkg_process_id, 'processing_status': job_status_queue}
+        uebhelper.update_package(model_configuration_pkg_id, data_dict)
+        base.session.clear()
+        tk.c.request_process_job_id = pkg_process_id
+        return tk.render('package_build_request_submission.html')
+    else:
+        # TODO: show error page
+        return "Error"
+
 
 def _send_request_to_app_server(request_zip_file):
-
     source = 'uebpackage.uebpackage.packagerequest._send_request_to_app_server():'
-    #service_host_address = 'thredds-ci-water.bluezone.usu.edu'
     service_host_address = uebhelper.StringSettings.app_server_host_address
-    #service_request_url = '/api/GenerateUEBPackage'
     service_request_url = uebhelper.StringSettings.app_server_api_generate_ueb_package_url
     connection = httplib.HTTPConnection(service_host_address)
     headers = {'Content-Type': 'application/text', 'Accept': 'application/text'}
@@ -251,10 +498,7 @@ def _update_request_resource_process_job_id(ueb_model_pkg_request_resource_id, p
     # to the resource metadata dict object where the key is not the name of a field in resource table.
     # For example, as shown below, we are storing a value for PackageProcessJobID
     # which will be added/updated to the existing json string stored in the extras field
-    
-    #matching_resource['PackageProcessJobID'] = pkg_process_id
-    #data_dict = matching_resource
-    #updated_resource = resource_update_action(context, data_dict)    
+
     data_dict = {'PackageProcessJobID': pkg_process_id}
     updated_resource = _update_resource(ueb_model_pkg_request_resource_id, data_dict)
     return updated_resource
@@ -313,30 +557,34 @@ def _create_ueb_pkg_build_request_zip_file(ueb_pkg_request_in_json, selected_fil
     context = {'model': base.model, 'session': base.model.Session,
                'user': tk.c.user or tk.c.author}
 
+    # get the storage path
+    ckan_storage_path = os.path.join(uploader.get_storage_path(), 'resources')
+
     # for each file id, get the file object and write to the temp destination dir
     for file_id in selected_file_ids.values():
-        # get the resource that has the id equal to the given resource id
+        # Note:4/22/2014: The way we are finding the filepath for a resource
+        # no more works in the new ckan 2.2 as the storage strategy has changed
+        # Refer to the uploader.py module and see how it gets the file path
+        # from the id of the resource. Use that technique to read each of the
+        # files to be part of the zip file
+        # new code
+        resource_file_path = os.path.join(ckan_storage_path, file_id[0:3], file_id[3:6], file_id[6:])
+        resource_file_obj = open(resource_file_path, 'r')
+        resource_file_obj.seek(0)
         data_dict = {'id': file_id}
         matching_file_resource = resource_show_action(context, data_dict)
-        file_url = matching_file_resource.get('url')
         file_name = matching_file_resource.get('name')
-        
-        # replace the  '%3A' in the file url with ':' to get the correct folder name in the file system
-        file_url = file_url.replace('%3A', ':')
-        sting_to_search_in_file_url = 'storage/f/'
-        search_string_index = file_url.find(sting_to_search_in_file_url)
-        file_path_start_index = search_string_index + len(sting_to_search_in_file_url)
-        file_path = file_url[file_path_start_index:]
-                
-        # get a file object in read mode pointing to the matching file in file store
-        source_file_obj = _retrieve_file_object_from_file_store(file_path)
-        file_data = source_file_obj.read()
-        source_file_obj.close()
-        
         # save file to the temp dir
         dest_file_path = os.path.join(destination_files_dir, file_name)
-        with open(dest_file_path, 'w') as file_obj:
-            file_obj.write(file_data)
+        dest_file_obj = open(dest_file_path, 'wb+')
+        while True:
+            data = resource_file_obj.read(2 ** 20)
+            if not data:
+                break
+            dest_file_obj.write(data)
+
+        resource_file_obj.close()
+        dest_file_obj.close()
                 
     # zip all the files in the destination_files_dir to a new zip folder under the destination_session_dir
     # make a folder to store the zip file
@@ -367,7 +615,8 @@ def _set_context_to_shape_file_resources():
     for gfs_dataset in geographic_fs_datasets:
         gfs_resources = gfs_dataset['resources']
         for resource in gfs_resources:
-            if resource['format'].lower() == 'zip' and resource['resource_type'] == 'file.upload' and \
+            if resource['format'].lower() == 'zip' and \
+                    (resource['resource_type'] == 'file.upload' or resource['url_type'] == 'upload') and \
                             resource['state'] == 'active':
                 # check if the file resource is owned by the current user
                 user_owns_resource = uebhelper.is_user_owns_resource(resource['id'], tk.c.user)
@@ -396,7 +645,6 @@ def _set_context_to_file_resources(file_extension):
 
     # get the resource that has the format field set to file_extension
     # and resource_type to file.upload
-    #data_dict = {'query': ['format:' + file_extension, 'resource_type:file.upload']}
     data_dict = {'query': ['format:' + file_extension]}
     shape_file_resources = resource_search_action(context, data_dict)['results']
 
@@ -435,7 +683,8 @@ def _get_file_id_from_file_name(package_id, filename):
     context = {'model': base.model, 'session': base.model.Session,
                'user': tk.c.user or tk.c.author}
     
-    # get the dataset/package that has the id equal to the given dtatset/package name (note: name is unique in package table)
+    # get the dataset/package that has the id equal to the given dataset/package name
+    # (note: name is unique in package table)
     data_dict = {'id': package_id}
     matching_package_with_resources = package_show_action(context, data_dict)
     files = matching_package_with_resources['resources']
@@ -642,10 +891,6 @@ def _validate_stage_one():
         # Get the error message for the form field (key)
         value = errors.get(key)            
         if value:  # error message exists
-            #for index, msg in enumerate(value):
-            #    msg = msg.encode('utf-8').replace('[', '').replace(']', '')
-            #    value[index] = msg
-            #value = value.replace('[', '').replace(']', '').replace('u', '')
             error_summary[key] = value
         
     tk.c.form_stage = form_stage     
@@ -1987,7 +2232,7 @@ def _get_package_request_in_json_format():
     tk.c.ueb_input_sections = []
     tk.c.ueb_input_section_data_items = {}
     
-    ueb_default_dataset = _get_package('ueb-default-input-dataset')    
+    ueb_default_dataset = _get_package('ueb-default-configuration-dataset')
     ueb_default_input_dataset_id = ueb_default_dataset['id']    # '0e39dd8f-85ac-4bee-b18c-ac5cb7d60328'
     
     stage_1_data = session['stage_1']
@@ -2394,54 +2639,42 @@ def _save_ueb_request_as_dataset(pkgname, selected_file_ids, selected_user_org):
 
     param pkgname: name of the package as entered by the user
     param selected_file_ids: a dict object containing name of files with their corresponding resource ids
+    param selected_user_org: id of the user selected organization for which a new dataset will be created
+    return: id of the new dataset that was created or None
     """
     source = 'uebpackage.packagecreate._save_ueb_request_as_dataset():'
 
     ckan_default_dir = uebhelper.StringSettings.ckan_user_session_temp_dir
     # create a directory for saving the file
     # this will be a dir in the form of: /tmp/ckan/{session id}/files
-    #destination_dir = os.path.join(ckan_default_dir, base.session.id, 'files') 
-    try: 
-        destination_dir = os.path.join(ckan_default_dir, base.session.id)  
+    #destination_dir = os.path.join(ckan_default_dir, base.session.id, 'files')
+    try:
+        destination_dir = os.path.join(ckan_default_dir, base.session.id)
         if os.path.isdir(destination_dir):
-            shutil.rmtree(destination_dir)  
+            shutil.rmtree(destination_dir)
         os.makedirs(destination_dir)
-    except Exception as e:          
+    except Exception as e:
         log.error(source + 'Failed to create temporary dir for shapefile: %s \n Exception: %s' % (destination_dir, e))
-        tk.abort(400, _('Failed to create temporary dir: %s') % destination_dir)
+        return None
 
     ueb_request_text_file_name = uebhelper.StringSettings.ueb_request_text_resource_file_name
     request_resource_file = os.path.join(destination_dir, ueb_request_text_file_name)
-    
+
     try:
-        with open(request_resource_file, 'w') as file_obj:        
+        with open(request_resource_file, 'w') as file_obj:
             for section in tk.c.ueb_input_sections:
                 file_obj.write(section + ':\n')
                 section_data_items = tk.c.ueb_input_section_data_items[section]
                 for key in section_data_items['order']:
                     data_item_line_to_write = '\t' + key + '%s' % section_data_items[key] + '\n'
                     file_obj.write(data_item_line_to_write)
-                
+
                 file_obj.write('\n')
-    except Exception as e:          
+    except Exception as e:
         log.error(source + 'Failed to save the ueb_package request file to temporary location'
                            ' for package: %s \n Exception: %s' % (pkgname, e))
-        tk.abort(400, _('Failed to process model package request: %s') % pkgname)
+        return None
 
-    # upload the file to CKAN file store
-    resource_metadata = _upload_file(request_resource_file)
-    
-    # retrieve some of the file meta data
-    resource_url = resource_metadata.get('_label') # this will return datetime stamp/filename
-    resource_url = base.h.url_for('storage_file', label=resource_url, qualified=False)
-
-    if resource_url.startswith('/'):
-        resource_url = base.config.get('ckan.site_url', '').rstrip('/') + resource_url
-    
-    resource_created_date = resource_metadata.get('_creation_date')
-    resource_name = resource_metadata.get('filename_original')
-    resource_size = resource_metadata.get('_content_length')
-    
     # create a package
     package_create_action = tk.get_action('package_create')
 
@@ -2465,109 +2698,115 @@ def _save_ueb_request_as_dataset(pkgname, selected_file_ids, selected_user_org):
     context = {'model': base.model, 'session': base.model.Session, 'user': tk.c.user or tk.c.author, 'save': 'save'}
     try:
         pkg_dict = package_create_action(context, data_dict)
-        log.info(source + 'A new dataset was created with name: %s' % data_dict['title'])
+        log.info(source + 'A new dataset was created with name: %s' % data_dict['title']
+                 + ' as part of ueb package build request.')
     except Exception as e:
         log.error(source + 'Failed to create a new dataset for ueb_package request for'
                            ' package name: %s \n Exception: %s' % (pkgname, e))
-        tk.abort(400, _('Failed to create a new dataset for UEB model package request: %s') % pkgname) 
-        
+
+        return None
+
     pkg_id = pkg_dict['id']
-    
+
     # add the uploaded ueb request data file as a resource to the above dataset
-    resource_create_action = tk.get_action('resource_create') 
-    
-    data_dict = {
-                "package_id": pkg_id,  # id of the package/dataset to which the resource needs to be added
-                "url": resource_url,
-                "name": resource_name,
-                "created": resource_created_date,
-                "format": "txt",
-                "size": resource_size,
-                "description": 'UEB model package build request'
-                }
-   
     try:
-        resource_add_dict = resource_create_action(context, data_dict) 
-        log.info(source + 'ueb_package request file was added as a resource for package name: %s' % pkgname)
+        _add_file_to_dataset(context, pkg_dict, request_resource_file)
     except Exception as e:
-        log.error(source + 'Failed to add the ueb_model_package request file as a resource to a'
-                           ' new dataset for package: %s \n Exception: %s' % (pkgname, e))
-        tk.abort(400, _('Failed to add the ueb_model_package request file as a resource for package: %s') % pkgname) 
+        log.error(source + ' Failed to update the newly created model-configuration dataset for adding package '
+                           'configuration file as a resource.\n Exception: %s' % e)
+        tk.get_action('package_delete')(context, {'id': pkg_id})
+        log.info(source + ' Deleting the newly created dataset')
+        return None
 
     # for each file id for the user selected files, get the file
     # object and add that to the package/dataset as a link resource
     resource_show_action = tk.get_action('resource_show')
-        
+
     for file_id in selected_file_ids.values():
         # get the resource that has the id equal to the given resource id
         data_dict = {'id': file_id}
         resource_metadata = resource_show_action(context, data_dict)
-        resource_url = resource_metadata.get('url')        
+        resource_url = resource_metadata.get('url')
         resource_name = resource_metadata.get('name')
         resource_desc = resource_metadata.get('description')
         resource_format = resource_metadata.get('format')
         resource_created_date = resource_metadata.get('_creation_date')
         resource_size = resource_metadata.get('_content_length')
-        
+
         data_dict = {
-                "package_id": pkg_id,  # id of the package/dataset to which the resource needs to be added
                 "url": resource_url,
                 "name": resource_name,
                 "created": resource_created_date,
                 "format": resource_format,
                 "size": resource_size,
-                "description": resource_desc, 
-                "resource_type": 'file.link'                     
+                "description": resource_desc,
+                "resource_type": 'file.link',
+                "url_type": 'link'
                 }
         try:
-            resource_create_action(context, data_dict)
+            pkg_dict = uebhelper.get_package(pkg_id)
+            _add_resource_link_to_dataset(context, pkg_dict, data_dict)
         except Exception as e:
             log.error(source + 'Failed to add resource links to the dataset as part of the user selected'
                                ' files for package name: %s \n Exception: %s' % (pkgname, e))
-            tk.abort(400, _('Failed to add resource links to the dataset as part of the UEB model package'
-                            ' request for package name: %s') % pkgname)
+            tk.get_action('package_delete')(context, {'id': pkg_id})
+            log.info(source + ' Deleting the newly created dataset')
+            return None
 
     return pkg_id
 
 
-def _upload_file(file_path):
-    """
-    uploads a file to ckan filestore as and returns file metadata
-    related to its existence in ckan
-    param file_path: name of the file with its current location (path)
-    """
-    source = 'uebpackage.packagecreate._upload_file():'
-    # this code has been implemented based on the code for the upload_handle() method
-    # in storage.py    
-    bucket_id = base.config.get('ckan.storage.bucket', 'default')    
-    ts = datetime.now().isoformat().split(".")[0]  # '2010-07-08T19:56:47'    
-    file_name = os.path.basename(file_path).replace(' ', '-')   # ueb request.txt -> ueb-request.txt
-    file_key = os.path.join(ts, file_name) 
-    label = file_key
-    params = {}
-    params['filename_original'] = os.path.basename(file_path)
-    params['key'] = file_key
-    try:
-        with open(file_path, 'r') as file_obj:
-            #file_data = file_obj.read()    
-            ofs = storage.get_ofs()
-            resource_metadata = ofs.put_stream(bucket_id, label, file_obj, params)
-            log.info(source + 'File upload was successful for file: %s' % file_path)
-    except Exception as e:
-        log.error(source + 'Failed to upload file: %s \nException %s' % (file_path, e))
-        tk.abort(400, _('Failed to upload file: %s') % file_path)
+def _add_file_to_dataset(context, pkg_dict, file_to_add):
 
-    return resource_metadata
+    if not 'resources' in pkg_dict:
+        pkg_dict['resources'] = []
+
+    file_name = os.path.basename(file_to_add)
+    file_name = munge.munge_filename(file_name)
+    file_part, file_extension = os.path.splitext(file_to_add)
+    # remove the dot from the extension string '.txt' -> 'txt'
+    file_extension = file_extension[1:]
+    resource = {'url': file_name, 'url_type': 'upload'}
+    upload = uploader.ResourceUpload(resource)
+    upload.filename = file_name
+    upload.upload_file = open(file_to_add, 'r')
+    # FIXME The url type setting here to file name is not appropriate. We need to pass the actual resource url
+    data_dict = {
+                'name': file_name,
+                'description': 'UEB configuration settings',
+                'format': file_extension,
+                'url': file_name,
+                'resource_type': 'file.upload',
+                'url_type': 'upload'
+    }
+
+    pkg_dict['resources'].append(data_dict)
+
+    context['defer_commit'] = True
+    context['use_cache'] = False
+    # update the package
+    package_update_action = tk.get_action('package_update')
+    package_update_action(context, pkg_dict)
+    context.pop('defer_commit')
+
+    # Get out resource_id resource from model as it will not appear in
+    # package_show until after commit
+    upload.upload(context['package'].resources[-1].id, uploader.get_max_resource_size())
+
+    base.model.repo.commit()
 
 
-def _retrieve_file_object_from_file_store(file_filestore_path): 
-    """
-    returns a file obj (in read mode) for the provided file in the ckan file store
-    which the caller then can use to read the contents of the file (file_obj.read())
-    param file_filestore_path : filecreationdatetime/followed by the filename
-    """
-    bucket_id = base.config.get('ckan.storage.bucket', 'default')   
-    ofs = storage.get_ofs()
-    file_obj = ofs.get_stream(bucket_id, file_filestore_path)    
-    
-    return file_obj
+def _add_resource_link_to_dataset(context, pkg_dict, resource_dict):
+    if not 'resources' in pkg_dict:
+        pkg_dict['resources'] = []
+
+    pkg_dict['resources'].append(resource_dict)
+    context['defer_commit'] = True
+    context['use_cache'] = False
+    # update the package
+    package_update_action = tk.get_action('package_update')
+    package_update_action(context, pkg_dict)
+    context.pop('defer_commit')
+    base.model.repo.commit()
+
+
