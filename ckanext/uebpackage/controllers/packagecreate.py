@@ -2,7 +2,6 @@ import ckan.lib.base as base
 import logging
 import ckan.plugins as p
 from ckan.lib.helpers import json
-from ckan.controllers import storage
 import ckan.lib.uploader as uploader
 import ckan.lib.munge as munge
 from datetime import datetime
@@ -10,6 +9,7 @@ import os
 import shutil
 import httplib
 from .. import helpers as uebhelper
+
 
 tk = p.toolkit
 _ = tk._    # translator function
@@ -285,7 +285,7 @@ def _save_ueb_package_as_dataset(service_call_results, model_config_dataset_id):
     retrieved.
     @return:
     """
-    source = 'uebpackage.tasks._save_ueb_package_as_dataset():'
+    source = 'uebpackage.packagecreate._save_ueb_package_as_dataset():'
     ckan_default_dir = uebhelper.StringSettings.ckan_user_session_temp_dir  # '/tmp/ckan'
 
     # get the matching model configuration dataset object
