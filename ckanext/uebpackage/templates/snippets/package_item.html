@@ -80,7 +80,7 @@ Example:
             {% if package.processing_status == 'In Queue' or package.processing_status == 'Processing' %}
                 <div>
                 {%  set btn_id = 'btn_build_status_%s' % package.id %}
-                    <button class="btn btn-primary" id={{ btn_id }} name="update" value="execute_ueb" type="submit">{{ _('Check status') }}</button>
+                    <button class="btn btn-primary" id={{ btn_id }} name="update" value="execute_ueb" type="submit">{{ _('Check Status') }}</button>
                 </div>
             {%  endif %}
             {%  if package.processing_status == 'Success' %}
@@ -91,16 +91,19 @@ Example:
                 {%  elif package.package_availability == 'Available' %}
                     {% set status_class ='bg-success' %}
                     {% set status_style ='background-color: lime' %}
-                {%  elif package.package_availability == 'Not available' %}
+                {%  elif package.package_availability == 'Ready to retrieve' %}
                     {% set status_class ='bg-danger' %}
                     {% set status_style ='background-color: aqua' %}
+                {%  elif package.package_availability == 'Not available' %}
+                    {% set status_class ='bg-danger' %}
+                    {% set status_style ='background-color: mediumpurple' %}
                 {%  endif %}
                 <p id={{ label_pkg_availability_status_id }} class="{{ status_class }}" style="{{ status_style }}">{{ 'Package availability status:' + package.package_availability }}</p>
             {%  endif %}
-            {%  if package.processing_status == 'Success' and package.package_availability == 'Not available' %}
+            {%  if package.processing_status == 'Success' and package.package_availability == 'Ready to retrieve' %}
                 <div>
                     {%  set btn_id = 'btn_retrieve_package-in_%s' % package.id %}
-                    <button class="btn btn-primary" id={{ btn_id }} name="retrieve" value="execute_ueb" type="submit">{{ _('Retrieve package') }}</button>
+                    <button class="btn btn-primary" id={{ btn_id }} name="retrieve" value="execute_ueb" type="submit">{{ _('Retrieve Package') }}</button>
                 </div>
             {% endif %}
             </div>
@@ -134,12 +137,12 @@ Example:
             {% if package.package_run_status == 'Not yet submitted' %}
                 <div>
                     {%  set btn_id = 'btn_run_package_%s' % package.id %}
-                    <button class="btn btn-primary" id={{ btn_id }} name="retrieve" value="execute_ueb" type="submit">{{ _('Execute package') }}</button>
+                    <button class="btn btn-primary" id={{ btn_id }} name="retrieve" value="execute_ueb" type="submit">{{ _('Execute Package') }}</button>
                 </div>
             {% elif package.package_run_status == 'In Queue' or package.package_run_status == 'Processing' %}
                 <div>
                     {%  set btn_id = 'btn_run_status_%s' % package.id %}
-                    <button class="btn btn-primary" id={{ btn_id }} name="update" type="submit">{{ _('Check status') }}</button>
+                    <button class="btn btn-primary" id={{ btn_id }} name="update" type="submit">{{ _('Check Status') }}</button>
                 </div>
             {% elif package.package_run_status == 'Success' %}
                 <div>

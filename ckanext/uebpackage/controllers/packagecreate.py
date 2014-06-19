@@ -195,8 +195,14 @@ class PackagecreateController(base.BaseController):
 
                         # update the dataset if the status has changed
                         if pkg_current_processing_status != request_processing_status:
-                            data_dict = {'processing_status': request_processing_status}
+                            if request_processing_status == 'Success':
+                                data_dict = {'processing_status': request_processing_status,
+                                             'package_availability': uebhelper.StringSettings.app_server_job_status_package_ready_to_retrieve}
+                            else:
+                                data_dict = {'processing_status': request_processing_status}
+
                             uebhelper.update_package(pkg_id, data_dict, backgroundTask=False)
+
                         ajax_response.success = True
                         ajax_response.message = "Status check was successful"
                         ajax_response.json_data = request_processing_status
@@ -221,7 +227,7 @@ class PackagecreateController(base.BaseController):
         ajax_response.message = "Not a valid UEB model configuration datatset for model package retrieval"
         if package['type'] == 'model-configuration':
             if package.get('processing_status', None):
-                if package['package_availability'] == 'Not available':
+                if package['package_availability'] == 'Ready to retrieve':
                     pkg_process_job_id = package.get('package_build_request_job_id', None)
                     pkg_current_availability_status = package.get('package_availability', None)
                     if pkg_process_job_id:

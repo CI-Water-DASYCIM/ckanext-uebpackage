@@ -2,6 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="7445eb22-3c5f-4a27-ac32-c39733b17129" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ckanext/uebpackage/helpers.py" afterPath="$PROJECT_DIR$/ckanext/uebpackage/helpers.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ckanext/uebpackage/templates/snippets/package_item.html" afterPath="$PROJECT_DIR$/ckanext/uebpackage/templates/snippets/package_item.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ckanext/uebpackage/public/scripts/package_status_check.js" afterPath="$PROJECT_DIR$/ckanext/uebpackage/public/scripts/package_status_check.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/ckanext/uebpackage/controllers/packagecreate.py" afterPath="$PROJECT_DIR$/ckanext/uebpackage/controllers/packagecreate.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -38,7 +41,7 @@
       <file leaf-file-name="packagecreate.py" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/controllers/packagecreate.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="20" column="8" selection-start="428" selection-end="428" vertical-scroll-proportion="0.54628223" vertical-offset="0" max-vertical-offset="50724">
+            <state line="20" column="8" selection-start="428" selection-end="428" vertical-scroll-proportion="0.27314112" vertical-offset="180" max-vertical-offset="50832">
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -49,7 +52,7 @@
       <file leaf-file-name="tasks.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/tasks.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="31" column="55" selection-start="964" selection-end="964" vertical-scroll-proportion="0.0" vertical-offset="9902" max-vertical-offset="14544">
+            <state line="31" column="55" selection-start="964" selection-end="964" vertical-scroll-proportion="0.0" vertical-offset="558" max-vertical-offset="14544">
               <folding />
             </state>
           </provider>
@@ -58,7 +61,7 @@
       <file leaf-file-name="package_item.html" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/templates/snippets/package_item.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="119" column="49" selection-start="6233" selection-end="6233" vertical-scroll-proportion="-11.444445" vertical-offset="1833" max-vertical-offset="2862">
+            <state line="119" column="49" selection-start="6269" selection-end="6269" vertical-scroll-proportion="0.0" vertical-offset="2142" max-vertical-offset="2916">
               <folding />
             </state>
           </provider>
@@ -85,7 +88,7 @@
       <file leaf-file-name="helpers.py" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/helpers.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="336" column="8" selection-start="12663" selection-end="12663" vertical-scroll-proportion="0.0" vertical-offset="5652" max-vertical-offset="6750">
+            <state line="336" column="8" selection-start="12701" selection-end="12701" vertical-scroll-proportion="0.0" vertical-offset="6048" max-vertical-offset="6768">
               <folding />
             </state>
           </provider>
@@ -94,7 +97,7 @@
       <file leaf-file-name="package_status_check.js" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/public/scripts/package_status_check.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="217" column="17" selection-start="9015" selection-end="9015" vertical-scroll-proportion="0.0" vertical-offset="3686" max-vertical-offset="6282">
+            <state line="217" column="0" selection-start="8925" selection-end="8925" vertical-scroll-proportion="0.0" vertical-offset="3906" max-vertical-offset="6930">
               <folding />
             </state>
           </provider>
@@ -179,6 +182,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -349,7 +353,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -467,9 +470,6 @@
       <option name="PARAMETERS" value="" />
       <method />
     </configuration>
-    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
-      <method />
-    </configuration>
     <configuration default="true" type="tests" factoryName="Unittests">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -491,6 +491,9 @@
       <option name="PUREUNITTEST" value="true" />
       <option name="PARAMS" value="" />
       <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
       <method />
     </configuration>
     <configuration default="true" type="tests" factoryName="Doctests">
@@ -611,7 +614,11 @@
       <created>1403040914765</created>
       <updated>1403040914765</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Minor changes- no logic changes though">
+      <created>1403107543209</created>
+      <updated>1403107543210</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -644,7 +651,7 @@
       <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Remote Host" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19488817" sideWeight="0.74178934" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1970181" sideWeight="0.74178934" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.35404897" sideWeight="0.3919063" order="7" side_tool="true" content_ui="tabs" />
@@ -687,7 +694,8 @@
     <MESSAGE value="Fixed the server error when submitting a package for execution - this error was happening at the CKAN level due to translator object being created even though this process is not a background process." />
     <MESSAGE value="Updated code for this plugin to work with CKAN 2.2" />
     <MESSAGE value="Removed reference to Celery module as we are no more using background task in CKAN 2.2. Remove was necessary for this extension to work on the deployment server running CKAN 2.2" />
-    <option name="LAST_COMMIT_MESSAGE" value="Removed reference to Celery module as we are no more using background task in CKAN 2.2. Remove was necessary for this extension to work on the deployment server running CKAN 2.2" />
+    <MESSAGE value="Minor changes- no logic changes though" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor changes- no logic changes though" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager />
@@ -980,7 +988,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/public/scripts/package_status_check.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="217" column="17" selection-start="9015" selection-end="9015" vertical-scroll-proportion="0.0" vertical-offset="3686" max-vertical-offset="6282">
+        <state line="217" column="0" selection-start="8925" selection-end="8925" vertical-scroll-proportion="0.0" vertical-offset="3906" max-vertical-offset="6930">
           <folding />
         </state>
       </provider>
@@ -999,7 +1007,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/helpers.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="336" column="8" selection-start="12663" selection-end="12663" vertical-scroll-proportion="0.0" vertical-offset="5652" max-vertical-offset="6750">
+        <state line="336" column="8" selection-start="12701" selection-end="12701" vertical-scroll-proportion="0.0" vertical-offset="6048" max-vertical-offset="6768">
           <folding />
         </state>
       </provider>
@@ -1034,14 +1042,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/templates/snippets/package_item.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="119" column="49" selection-start="6233" selection-end="6233" vertical-scroll-proportion="-11.444445" vertical-offset="1833" max-vertical-offset="2862">
+        <state line="119" column="49" selection-start="6269" selection-end="6269" vertical-scroll-proportion="0.0" vertical-offset="2142" max-vertical-offset="2916">
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/ckanext/uebpackage/controllers/packagecreate.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="20" column="8" selection-start="428" selection-end="428" vertical-scroll-proportion="0.54628223" vertical-offset="0" max-vertical-offset="50724">
+        <state line="20" column="8" selection-start="428" selection-end="428" vertical-scroll-proportion="0.27314112" vertical-offset="180" max-vertical-offset="50832">
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>

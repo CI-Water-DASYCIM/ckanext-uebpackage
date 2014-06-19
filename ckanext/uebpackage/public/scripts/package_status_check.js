@@ -22,6 +22,18 @@ $(document).ready(function(){
                     retrievePackageOut(idSplit[3])
                 }
     })
+
+    $('[id^=lbl_status_]').each(function(){
+        if($(this).text().indexOf('Processing') > -1){
+            animateProgress(this, $(this).text());
+        }
+    })
+
+    $('[id^=label_model_pkg_run_status_]').each(function(){
+        if($(this).text().indexOf('Processing') > -1){
+            animateProgress(this, $(this).text());
+        }
+    })
 })
 
 function updatePackageStatus(pkg_id){
@@ -41,6 +53,7 @@ function updatePackageStatus(pkg_id){
             if(data.success == true)
             {
                 var status_label = '#lbl_status_' + pkg_id;
+                var old_status_text = $(status_label).text();
                 $(status_label).text("Package build status:" + data.json_data)
                 // change the background color
                 if(data.json_data === 'In Queue'){
@@ -48,13 +61,16 @@ function updatePackageStatus(pkg_id){
                 }
                 else if(data.json_data === 'Processing'){
                     $(status_label).css({'background-color':statusStyles.processing});
+                    if(old_status_text.indexOf('Processing') == -1){
+                        animateProgress(status_label, $(status_label).text());
+                    }
                 }
                 else if(data.json_data === 'Success'){
                     var btn_id = 'btn_retrieve_package-in_' + pkg_id;
                     var label_pkg_availability_status_id = 'lbl_pkg_availability_status_' + pkg_id;
 
-                    var label_html = "<p id=" + label_pkg_availability_status_id  + " style='background-color: aqua'>Package availability status: Not available</p>";
-                    var btn_html = "<div><button class='btn btn-primary' id=" + btn_id + " name='retrieve' type='submit'>Retrieve package</button></div>";
+                    var label_html = "<p id=" + label_pkg_availability_status_id  + " style='background-color: aqua'>Package availability status: Ready to retrieve</p>";
+                    var btn_html = "<div><button class='btn btn-primary' id=" + btn_id + " name='retrieve' type='submit'>Retrieve Package</button></div>";
                     var div_id = "#div_id_" + pkg_id;
                     $(div_id).append(label_html);
                     $(div_id).append(btn_html);
@@ -89,7 +105,7 @@ function updatePackageStatus(pkg_id){
 function retrievePackageIn(pkg_id){
     freezeWindow();
 
-    var statusStyles = {"not_available": 'aqua', "available" : 'lime', "error": 'red'};
+    var statusStyles = {"not_available": 'mediumpurple', "available" : 'lime', "error": 'red'};
     var CKAN_Action_URL = '/uebpackage/retrieve_input_package/' + pkg_id;
     $.ajaxSetup({
         timeout: 120000 // 120 seconds
@@ -215,6 +231,7 @@ function executeModelPackage(pkg_id){
                 }
                 else if(data.json_data === 'Processing'){
                     $(status_label).css({'background-color':statusStyles.processing});
+                    animateProgress(status_label, $(status_label).text());
                 }
                 else if(data.json_data === 'Error'){
                     $(status_label).css({'background-color':statusStyles.error});
@@ -225,7 +242,7 @@ function executeModelPackage(pkg_id){
 
                 if(data.json_data !== 'Error'){
                     var btn_id = 'btn_run_status_' + pkg_id;
-                    var btn_html = "<div><button class='btn btn-primary' id=" + btn_id + " name='update' type='submit'>Check status</button></div>";
+                    var btn_html = "<div><button class='btn btn-primary' id=" + btn_id + " name='update' type='submit'>Check Status</button></div>";
                     var div_id = "#div_id_" + pkg_id;
                     $(div_id).append(btn_html);
                     $('#'+btn_id).click(function(){
@@ -274,6 +291,7 @@ function updateRunStatus(pkg_id){
 
             alert(data.message);
             var status_label = '#label_model_pkg_run_status_' + pkg_id;
+            var old_status_text = $(status_label).text();
             $(status_label).text("Package run status:" + data.json_data)
             if(data.success == true)
             {
@@ -283,6 +301,9 @@ function updateRunStatus(pkg_id){
                 }
                 else if(data.json_data === 'Processing'){
                     $(status_label).css({'background-color':statusStyles.processing});
+                    if(old_status_text.indexOf('Processing') == -1){
+                        animateProgress(status_label, $(status_label).text());
+                    }
                 }
                 else if(data.json_data === 'Error'){
                     $(status_label).css({'background-color':statusStyles.error});
@@ -329,6 +350,21 @@ function updateRunStatus(pkg_id){
 
 }
 
+function animateProgress(label_element, lbl_text){
+    var dots = window.setInterval( function() {
+        if($(label_element).text().indexOf('Processing') == -1){
+            clearInterval(dots);
+        }
+        else{
+            var init_status = lbl_text
+            var max_status = lbl_text + ".........."
+            if ( $(label_element).text().length > max_status.length )
+                $(label_element).text(init_status);
+            else
+                $(label_element).text($(label_element).text() + ".");
+        }
+    }, 300);
+}
 function freezeWindow()
 	{
 	    var freezeDiv = document.createElement("div");

@@ -69,6 +69,7 @@ class StringSettings(object):
     app_server_job_status_error = 'Error'
     app_server_job_status_package_available = 'Available'
     app_server_job_status_package_not_available = 'Not available'
+    app_server_job_status_package_ready_to_retrieve = 'Ready to retrieve'
     app_server_job_status_package_retrieval_failed = 'Failed to retrieve package file'
     app_server_job_status_package_retrieval_success = 'Output package merged'
 
